@@ -1,53 +1,36 @@
 class Solution {
 public:
-    bool isSafe(int row, int col, vector<string> board, int n){
-        int holdrow = row;
-        int holdcol = col;
-
-        while(row>=0 && col>=0){
-            if(board[row][col] == 'Q') return false;
-            row--;
-            col--;
-        }
-
-        row = holdrow;
-        col = holdcol;
-        while(col>=0){
-            if(board[row][col] == 'Q') return false;
-            col--;
-        }
-
-        row = holdrow;
-        col = holdcol;
-        while(row<n && col>=0){
-            if(board[row][col] == 'Q')return false;
-            row++;
-            col--;
-        }
-        return true;
-    }
-    void solve(int col, vector<string> &board, vector<vector<string>> &ans, int n){
-        if(col == n ){
+    
+    void solve(int col, vector<vector<string>> &ans, vector<string> &board, vector<int> &rowCheck, vector<int> &upperDiagCheck, vector<int> &lowerDiagCheck, int n){
+        if(col == n){
             ans.push_back(board);
             return;
         }
-        for(int row = 0 ; row<n; row++){
-            if(isSafe(row, col, board, n)){
+        for(int row = 0; row<n; row++){
+            if(rowCheck[row]==0 && upperDiagCheck[n-1+(col-row)]==0 && lowerDiagCheck[row+col]== 0){
                 board[row][col] = 'Q';
-                solve(col+1, board, ans, n);
+                rowCheck[row] = 1;
+                upperDiagCheck[n-1+(col-row)] = 1;
+                lowerDiagCheck[row+col] = 1;
+                solve(col+1,ans, board,rowCheck, upperDiagCheck, lowerDiagCheck, n);
                 board[row][col] = '.';
+                rowCheck[row] = 0;
+                upperDiagCheck[n-1+(col-row)] = 0;
+                lowerDiagCheck[row+col] = 0;
             }
         }
+        
     }
-public:
+    
     vector<vector<string>> solveNQueens(int n) {
         vector<vector<string>> ans;
         vector<string> board(n);
         string s(n, '.');
-        for(int i = 0; i<n; i++){
+        for(int i = 0; i<n ; i++){
             board[i] = s;
         }
-        solve(0, board, ans, n);
+        vector<int> rowCheck(n, 0), upperDiagCheck(2*n-1,0), lowerDiagCheck(2*n-1,0);
+        solve(0, ans , board, rowCheck, upperDiagCheck, lowerDiagCheck, n);
         return ans;
     }
 };
